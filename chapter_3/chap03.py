@@ -258,3 +258,95 @@ plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
 plt.legend(loc='best')
 plt.show()
+
+## using radial basis function (rbf) for non linear problem
+svm = SVC(kernel='rbf',random_state=1,gamma=0.1,C=10.0)
+svm.fit(X_xor,y_xor)
+plot_decision_regions(X_xor,y_xor,classifier=svm)
+plt.legend(loc='upper left')
+plt.tight_layout()
+plt.show()
+
+svm = SVC(kernel='rbf',random_state=1,gamma=100.0,C=1.0) #gamma parameter plays important role in optimizing the bias 
+svm.fit(X_train_std,y_train)                                #and variance when algo too sensitive on training dataset.
+plot_decision_regions(X_combined_std,y_combined,classifier=svm,test_idx=range(105,150))
+plt.xlabel('Petal length [standardized]')
+plt.ylabel('Petal width [standardized]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+plt.show()
+
+# ##entropy for decision tree
+
+def entropy(p):
+    return -p * np.log2(p) - (1-p) * np.log2((1-p))
+
+x = np.arange(0.0,1.0,0.01)
+ent  = [entropy(p) if p!=0 else None for p in x]
+plt.ylabel('Entropy')
+plt.xlabel('Class membership probability p(i=1)')
+plt.plot(x,ent)
+plt.show()
+
+
+## ##Impurity detection methods
+def gini(p):
+    return p*(1-p)+(1-p)*(1-(1-p))
+
+def entropy(p):
+    return -p*np.log2(p)-(1-p)*np.log2((1-p))
+def error(p):
+    return 1 - np.max([p,1-p])
+
+x = np.arange(0.0,1.0,0.01)
+ent = [entropy(p) if p!=0 else None for p in x]
+sc_ent = [e*0.5 if e else None for e in ent]
+err = [error(i) for i in x]
+fig = plt.figure()
+ax = plt.subplot(111)
+
+for i, lab, ls,c, in zip([ent,sc_ent,gini(x),err],
+                         ['Entropy','Entropy (scaled)','Gini impurity',
+                          'Misclassification error'],
+                          ['-','-','--','-.'],['black','lightgray','red','green','cyan']):
+    line = ax.plot(x,i,label=lab,linestyle=ls,lw=2,color=c)
+ax.legend(loc='upper center',bbox_to_anchor=(0.5,1.15),
+          ncol=5,fancybox = True,shadow=False)
+ax.axhline(y=0.5,linewidth=1,color='k',linestyle='--')
+ax.axhline(y=1.0,linewidth=1,color='k',linestyle='--')
+plt.ylim([0,1.1])
+plt.xlabel('p(i=1)')
+plt.ylabel('impurity index')
+plt.show()
+
+# ## Building a decision tree using sklearn
+
+from sklearn.tree import DecisionTreeClassifier
+tree_model = DecisionTreeClassifier(criterion='gini',max_depth=4,random_state=1)
+
+tree_model.fit(X_train,y_train)
+X_combined = np.vstack((X_train,X_test))
+y_combined = np.hstack((y_train,y_test))
+plot_decision_regions(X_combined,y_combined,classifier=tree_model,test_idx=range(105,150))
+plt.xlabel('Petal length [cm]')
+plt.ylabel('Petal width [cm]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+plt.show()
+
+# ##making decision tree
+from sklearn import tree
+features_names = ['Sepal length','Sepal width','Petal length','Petal width']
+tree.plot_tree(tree_model,feature_names=features_names,filled=True)
+plt.show()
+
+# ## Random Forest Classifier
+from sklearn.ensemble import RandomForestClassifier
+forest = RandomForestClassifier(n_estimators=25,random_state=1,n_jobs=2)
+forest.fit(X_train,y_train)
+plot_decision_regions(X_combined,y_combined,classifier=forest,test_idx=range(105,150))
+plt.xlabel('Petal length [cm]')
+plt.ylabel('Petal width [cm]')
+plt.legend(loc='upper left')
+plt.tight_layout()
+plt.show()
