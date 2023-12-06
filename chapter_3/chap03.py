@@ -362,3 +362,8 @@ plt.ylabel('Petal width [Standardized]')
 plt.legend(loc='upper left')
 plt.tight_layout()
 plt.show()
+
+# ###  Partitioning a dataset into separate training and test datasets
+df_wine = pd.read_csv('https://archive.ics.uci.edu/ml/'
+'machine-learning-databases/wine/wine.data');
+print(df_wine.head)
