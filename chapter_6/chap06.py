@@ -291,3 +291,34 @@ plt.xlabel('FPR')
 plt.ylabel('TPR')
 plt.legend(loc='lower right')
 plt.show()
+
+
+## ## different scoring functions for multiclass problem
+pre_scorer = make_scorer(score_func=precision_score,
+                         pos_label=1,
+                         greater_is_better=True,
+                         average='micro')
+print(pre_scorer)
+
+#### Dealing with class imbalance
+X_imb = np.vstack((X[y==0],X[y==1][:40]))
+y_imb = np.hstack((y[y==0],y[y==1][:40]))
+
+y_pred = np.zeros(y_imb.shape[0])
+print(np.mean(y_pred == y_imb)*100)
+
+## Resampling to remove class imbalance
+from sklearn.utils import resample
+print('Number of class 1 examples before:', X_imb[y_imb==1].shape[0])
+X_unsampled,y_unsampled = resample(
+    X_imb[y_imb==1],y_imb[y_imb==1],
+    replace=True,n_samples=X_imb[y_imb==0].shape[0],
+    random_state=123
+)
+print('Number of class 1 after resample is :' , X_unsampled.shape[0])
+
+X_bal = np.vstack((X[y==0],X_unsampled))
+y_bal = np.hstack((y[y==0],y_unsampled))
+
+y_pred = np.zeros(y_bal.shape[0])
+print(np.mean(y_pred == y_bal)*100) 
