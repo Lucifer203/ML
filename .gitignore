@@ -1,0 +1,4 @@
+celeba/
+MNIST/
+__MACOSX/
+*.pt
